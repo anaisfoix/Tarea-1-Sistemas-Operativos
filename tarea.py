@@ -89,8 +89,8 @@ for i in range (filas):
 
 for linea in lineas:
     datos=linea.split(',')
-    columna=int(datos[0])
-    fila=int(datos[1])
+    fila=int(datos[0])
+    columna=int(datos[1])
     dato=datos[2]
     matriz[fila][columna]=dato[0]
 
