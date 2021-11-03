@@ -137,13 +137,12 @@ def clon(x, y, direccion):
                 t.setDaemon(True)
                 t.start()
                 hilos.append(t)
-
             direccion=dirs[0]
 
         if len(dirs)==1:
             sem_matriz.acquire()
             matriz[x][y]='B'
-            direccion=dir[0]
+            direccion=dirs[0]
             sem_matriz.release()
 
 
