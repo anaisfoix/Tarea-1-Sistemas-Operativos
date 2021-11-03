@@ -102,6 +102,7 @@ def cuentaBifurcaciones(x, y):
 def clon(x, y, direccion):
     global run
     global encontrado
+    sem_clones.acquire()
     while run and not encontrado:
         sleep(0.05)
         x=x+direcciones[direccion][0]
@@ -131,8 +132,7 @@ def clon(x, y, direccion):
             matriz[x][y]='B'
             sem_matriz.release()
             hilos=[]
-            for i in range(1, len(dirs)):
-                sem_clones.acquire()
+            for i in range(1, len(dirs)):                
                 t= Thread(target=clon, args=(x,y,dirs[i]))
                 t.setDaemon(True)
                 t.start()
