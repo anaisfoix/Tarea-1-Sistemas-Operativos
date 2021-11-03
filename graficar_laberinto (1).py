@@ -28,7 +28,7 @@ SCREEN_HEIGHT = 600
 
 filas = 50
 columnas = 30
-filename = 'inputLaberinto.txt'
+filename = 'laberinto.txt'
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -58,8 +58,8 @@ for i in range(1, columnas):
 pygame.display.update()
 
 
-file=open(filename)
-lineas=file.readlines()
+file = open(filename)
+lineas = file.readlines()
 
 # Creamos la matriz
 matriz = []
