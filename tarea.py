@@ -7,11 +7,11 @@ colores = {
     ' ' : (255,255,255), 
     'X' : (0,0,0), 
     'V' : (0,50,255), 
-    'B' : (0,255,0), 
+    'R' : (0,255,0), 
     'C' : (255,0,0), 
 }
 
-# 
+# Todas las posibles combinaciones de espacios permitidos desde un punto fijo
 direcciones={
     'u':(0,1),
     'd':(0,-1),
@@ -79,7 +79,7 @@ def cuentaBifurcaciones(x, y):
                 direccionesValidas.append(i)
     return direccionesValidas
 
-# Funcion encargada 
+# Funcion encargada del comportamiento de los clones dentro del laberinto
 def clon(x, y, direccion):
     global run
     global encontrado
@@ -108,7 +108,7 @@ def clon(x, y, direccion):
 
         if len(dirs)>1:
             sem_matriz.acquire()
-            matriz[x][y]='B'
+            matriz[x][y]='R'
             sem_matriz.release()
             hilos=[]
             for i in range(1, len(dirs)):                
@@ -120,7 +120,7 @@ def clon(x, y, direccion):
 
         if len(dirs)==1:
             sem_matriz.acquire()
-            matriz[x][y]='B'
+            matriz[x][y]='R'
             direccion=dirs[0]
             sem_matriz.release()
 
