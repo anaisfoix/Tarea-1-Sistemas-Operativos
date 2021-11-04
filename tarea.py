@@ -1,15 +1,13 @@
 import pygame
-from math import floor
 from time import sleep
 from threading import Semaphore, Thread
-
 
 colores = {
     ' ' : (255,255,255), 
     'X' : (0,0,0), 
-    'V' : (0,255,255), 
-    'B' : (255,255,0), 
-    'C' : (255,0,255), 
+    'V' : (0,50,255), 
+    'B' : (0,255,0), 
+    'C' : (255,0,0), 
 }
 
 direcciones={
@@ -19,7 +17,6 @@ direcciones={
     'r':(1,0),
     's':(0,0)
 }
-
 
 def actualiza_laberinto():
     for i in range(0, filas):
@@ -31,49 +28,30 @@ def dibuja_cuadrado(y, x, color):
     pygame.draw.rect(screen, color, pygame.Rect(150 + x*ancho + 1, 100 + y*largo +1, ancho, largo))
 
 
-SCREEN_WIDTH = 700
-SCREEN_HEIGHT = 600
-
 filas = 50
 columnas = 30
-filename = 'inputLaberinto.txt'
 
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((600, 500))
 clock = pygame.time.Clock()
 
 # Fondo blanco
 screen.fill([255,255,255])
 
-pygame.display.update()
-
 # El contorno del laberinto
-pygame.draw.rect(screen, (230,30,30), pygame.Rect(150,100,400,400), 1)
+pygame.draw.rect(screen, (230,30,30), pygame.Rect(150,100,300,300), 1)
 
 # Ancho y largo de los cuadros dentro de la matriz
-ancho = 400/columnas
-largo = 400/filas
+ancho = 300/columnas
+largo = 300/filas
 
-# Lineas horizontales
-for i in range(1, filas):
-        pygame.draw.line(screen, (230, 30, 30), (150,100 + i*largo), (400+150,100 +  i*largo), 1)
-
-# Para líneas verticales
-for i in range(1, columnas):
-    pygame.draw.line(screen, (230, 30, 30), (150 + i*ancho, 100), (150 +  i*ancho, 100 + 400), 1)
-
-
-pygame.display.update()
-
-
-file=open(filename)
+file=open('inputLaberinto.txt')
 lineas=file.readlines()
 
 # Creamos la matriz
 matriz = []
 for i in range(filas):
     matriz.append([' '] * 30)
-
 
 # Colocamos las paredes y la ventana
 for linea in lineas:
