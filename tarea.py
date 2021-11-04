@@ -2,6 +2,7 @@ import pygame
 from time import sleep
 from threading import Semaphore, Thread
 
+# Gamma de colores a ocupar (para poder distingir diferentes partes del laberinto)
 colores = {
     ' ' : (255,255,255), 
     'X' : (0,0,0), 
@@ -10,6 +11,7 @@ colores = {
     'C' : (255,0,0), 
 }
 
+# 
 direcciones={
     'u':(0,1),
     'd':(0,-1),
@@ -18,33 +20,27 @@ direcciones={
     's':(0,0)
 }
 
-def actualiza_laberinto():
-    for i in range(0, filas):
-        for j in range(0, columnas):
-            dibuja_cuadrado(i, j, colores[matriz[i][j]])
-    pygame.display.update()
-
-def dibuja_cuadrado(y, x, color):
-    pygame.draw.rect(screen, color, pygame.Rect(150 + x*ancho + 1, 100 + y*largo +1, ancho, largo))
-
-
+# Valores Globales
 filas = 50
 columnas = 30
+run = True
+encontrado=False
+sem_clones= Semaphore(10)
+sem_matriz= Semaphore(1)
 
-pygame.init()
-screen = pygame.display.set_mode((600, 500))
-clock = pygame.time.Clock()
-
-# Fondo blanco
-screen.fill([255,255,255])
-
-# El contorno del laberinto
-pygame.draw.rect(screen, (230,30,30), pygame.Rect(150,100,300,300), 1)
-
-# Ancho y largo de los cuadros dentro de la matriz
+# Valores globales de los cuadros dentro de la matriz
 ancho = 300/columnas
 largo = 300/filas
 
+# Se inicia pygame
+pygame.init()
+
+# Se establecen caracteristicas basicas de la ventana (tamaño , color de fondo  , contorno)
+screen = pygame.display.set_mode((600, 500))
+screen.fill([255,255,255])
+pygame.draw.rect(screen, (230,30,30), pygame.Rect(150,100,300,300), 1)
+
+# Abrimos y escaneamos el archivo
 file=open('inputLaberinto.txt')
 lineas=file.readlines()
 
@@ -61,12 +57,18 @@ for linea in lineas:
     dato = datos[2]
     matriz[fila][columna] = dato[0]
 
-sem_clones= Semaphore(10)
-sem_matriz= Semaphore(1)
+# Funcion encargada de actualizar la pantalla del laberinto
+def actualiza_laberinto():
+    for i in range(0, 50):
+        for j in range(0, columnas):
+            dibuja_cuadrado(i, j, colores[matriz[i][j]])
+    pygame.display.update()
 
-run = True
-encontrado=False
+# Funcion encargada de ir rellenando de color las diferentes partes del laberinto
+def dibuja_cuadrado(y, x, color):
+    pygame.draw.rect(screen, color, pygame.Rect(150 + x*ancho + 1, 100 + y*largo +1, ancho, largo))
 
+# Funcion encargada de contar direcciones validas donde se puede desplazar una copia
 def cuentaBifurcaciones(x, y):
     direccionesValidas=[]
     for i in ['u', 'd', 'l', 'r']:
@@ -77,6 +79,7 @@ def cuentaBifurcaciones(x, y):
                 direccionesValidas.append(i)
     return direccionesValidas
 
+# Funcion encargada 
 def clon(x, y, direccion):
     global run
     global encontrado
@@ -89,8 +92,6 @@ def clon(x, y, direccion):
         if matriz[x][y]=='V':
             print(f'La salida está en ({x}, {y})')
             encontrado=True
-            sem_matriz.release()
-            sem_clones.release()
             return
         if matriz[x][y]!=' ':
             sem_clones.release()
