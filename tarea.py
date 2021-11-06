@@ -13,11 +13,11 @@ colores = {
 
 # Todas las posibles combinaciones de espacios permitidos desde un punto fijo
 direcciones={
-    'u':(0,1),
-    'd':(0,-1),
-    'l':(-1,0),
-    'r':(1,0),
-    's':(0,0)
+    'arri':(0,1),
+    'abaj':(0,-1),
+    'izq':(-1,0),
+    'der':(1,0),
+    'cent':(0,0)
 }
 
 # Valores Globales
@@ -60,7 +60,7 @@ for linea in lineas:
 # Funcion encargada de actualizar la pantalla del laberinto
 def actualiza_laberinto():
     for i in range(0, 50):
-        for j in range(0, columnas):
+        for j in range(0, 30):
             dibuja_cuadrado(i, j, colores[matriz[i][j]])
     pygame.display.update()
 
@@ -71,7 +71,7 @@ def dibuja_cuadrado(y, x, color):
 # Funcion encargada de contar direcciones validas donde se puede desplazar una copia
 def cuentaBifurcaciones(x, y):
     direccionesValidas=[]
-    for i in ['u', 'd', 'l', 'r']:
+    for i in ['arri', 'abaj', 'izq', 'der']:
         x_=x+direcciones[i][0]
         y_=y+direcciones[i][1]
         if y_>-1 and y_<columnas and x_>-1 and x_<filas:
@@ -93,18 +93,16 @@ def clon(x, y, direccion):
             print(f'La salida está en ({x}, {y})')
             encontrado=True
             return
-        if matriz[x][y]!=' ':
-            sem_clones.release()
-            sem_matriz.release()
-            return
+
         matriz[x][y]='C'
         sem_matriz.release()
-
         dirs=cuentaBifurcaciones(x, y)
-    
-        if len(dirs)==0:
-            sem_clones.release()
-            return
+        
+        if len(dirs)==1:
+            sem_matriz.acquire()
+            matriz[x][y]='R'
+            direccion=dirs[0]
+            sem_matriz.release()
 
         if len(dirs)>1:
             sem_matriz.acquire()
@@ -118,14 +116,12 @@ def clon(x, y, direccion):
                 hilos.append(t)
             direccion=dirs[0]
 
-        if len(dirs)==1:
-            sem_matriz.acquire()
-            matriz[x][y]='R'
-            direccion=dirs[0]
-            sem_matriz.release()
+        if len(dirs)==0:
+            sem_clones.release()
+            return
 
 
-t=Thread(target=clon, args=(0,0,'s'))
+t=Thread(target=clon, args=(0,0,'cent'))
 t.setDaemon(True)
 t.start()
 
