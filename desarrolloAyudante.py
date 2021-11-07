@@ -12,6 +12,14 @@ colores = {
     'C' : (255,0,255), 
 }
 
+direcciones={
+    'u':(0,1),
+    'd':(0,-1),
+    'l':(-1,0),
+    'r':(1,0),
+    's':(0,0)
+}
+
 
 def actualiza_laberinto():
     for i in range(0, filas):
@@ -75,10 +83,73 @@ for linea in lineas:
     dato = datos[2]
     matriz[fila][columna] = dato[0]
 
+sem_clones= Semaphore(10)
+sem_matriz= Semaphore(1)
+
 run = True
-#####################################################
-#         ACÁ CREAR LA LÓGICA DE LOS HILOS          #
-#####################################################
+encontrado=False
+
+def cuentaBifurcaciones(x, y):
+    direccionesValidas=[]
+    for i in ['u', 'd', 'l', 'r']:
+        x_=x+direcciones[i][0]
+        y_=y+direcciones[i][1]
+        if y_>-1 and y_<columnas and x_>-1 and x_<filas:
+            if matriz[x_][y_]==' ' or matriz[x_][y_]=='V':
+                direccionesValidas.append(i)
+    return direccionesValidas
+
+def clon(x, y, direccion):
+    global run
+    global encontrado
+    sem_clones.acquire()
+    while run and not encontrado:
+        sleep(0.05)
+        x=x+direcciones[direccion][0]
+        y=y+direcciones[direccion][1]  
+        sem_matriz.acquire()
+        if matriz[x][y]=='V':
+            print(f'La salida está en ({x}, {y})')
+            encontrado=True
+            sem_matriz.release()
+            sem_clones.release()
+            return
+        if matriz[x][y]!=' ':
+            sem_clones.release()
+            sem_matriz.release()
+            return
+        matriz[x][y]='C'
+        sem_matriz.release()
+
+        dirs=cuentaBifurcaciones(x, y)
+    
+        if len(dirs)==0:
+            sem_clones.release()
+            return
+
+        if len(dirs)>1:
+            sem_matriz.acquire()
+            matriz[x][y]='B'
+            sem_matriz.release()
+            hilos=[]
+            for i in range(1, len(dirs)):                
+                t= Thread(target=clon, args=(x,y,dirs[i]))
+                t.setDaemon(True)
+                t.start()
+                hilos.append(t)
+            direccion=dirs[0]
+
+        if len(dirs)==1:
+            sem_matriz.acquire()
+            matriz[x][y]='B'
+            direccion=dirs[0]
+            sem_matriz.release()
+
+
+t=Thread(target=clon, args=(0,0,'s'))
+t.setDaemon(True)
+t.start()
+
 
 # Loop principal de pygame. Es necesario para que windows no crea que no responde.
 while run:
