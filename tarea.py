@@ -1,3 +1,6 @@
+# Anais Foix Monardes 20.834.761-6
+# Francisco Muñoz Alarcon 20.242.456-2
+
 import pygame
 from time import sleep
 from threading import Semaphore, Thread
